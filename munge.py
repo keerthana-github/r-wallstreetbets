@@ -36,7 +36,7 @@ emoji_count = 0
 for line in csv.reader(data):
     # first line must write header
     if line[0] == 'title':
-        new_data.write("title,score,comms_num,timestamp,emoji_exists\n")
+        new_data.write("title,score,comms_num,timestamp,emoji_count,title_length\n")
         timestamp_data.write("words,timestamp\n")
         wordcount_data.write("word,count\n")
     # every other line
@@ -110,7 +110,7 @@ for line in csv.reader(data):
         title = ' '.join(titlewords)
         # write data with title, time stamps, comments, score, and emoji count
         new_data.write('"'+title + '"' + ',' +
-                       line[1] + ',' + line[4]+',' + line[7] + ',' + str(emoji_count) + "\n")
+                       line[1] + ',' + line[4]+',' + line[7] + ',' + str(emoji_count) + ',' + str(len(titlewords)) + "\n")
         # write in timestamp data
         for i in titlewords:
             timestamp_data.write('"' + i.lower() + '"' + ',' + line[7] + "\n")
