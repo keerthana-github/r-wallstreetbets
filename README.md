@@ -208,6 +208,3 @@ STD | 167.298439
 SUMIF (all counts = 1) | 67582
 SUMIF (all counts approx. avg 15) | 4516
 COUNTIF (game*) | 182
-
-## Extra-credit
-This assignment deserves extra credit based on the requirements provided for extra credit. Although I was unable to collect data with a webscrapper myself, the data I'm working with is both big (over 35,000 entries) and complex (related to NLP by parsing through text data even if NLP wasn't explicitly conducted using Excel and conducting three separate analyses). Because of the way I parsed my data, some of the CSVs include over 100,000 data entries. Given that I've parsed through that much data and was successful in the process, I would be grateful if I was offered extra credit.
