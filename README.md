@@ -5,10 +5,10 @@
 I decided I wanted to take a look at Reddit data; specifically, I wanted to take a look at the subreddit [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets/). Having some difficulty with using a web parser, I decided to go with a dataset I ended up finding on [Kaggle](https://www.kaggle.com/gpreda/reddit-wallstreetsbets-posts) with a person who was able to collect the data using Reddit's API. The data came in a CSV format and included values such as the post title, number of upvotes (or the score), the url, the number of comments, the content in the body, and when the content was posted. As you can see from the first 20 rows from the original data set, there is a lot of data to parse through and a lot of unnecessary information. The first task was getting rid of all the emojis in the title and body because Excel could not parse/understand the data and instead returned unconventional characters. To accomplish that, I used a regex expression:
 
 
-def strip_emoji(text):
-    RE_EMOJI = re.compile(
-        u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
-    return RE_EMOJI.sub(r'', text)
+    def strip_emoji(text):
+        RE_EMOJI = re.compile(
+            u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
+        return RE_EMOJI.sub(r'', text)
 
 
 Here, my goal was to use pattern matching to find any emojis that could exist in the text and "substitute" it out with an empty string.I also imported the emoji module to count how many emojis were in each post's title, dividing by 4 because of my nested for loop quadrupling the results. Once I got the emojis out, I moved on to "deleting" the columns; in reality, that was just me excluding the columns from when I wrote the data into the file. Specifically, I nixed the ID, URL, and CREATED columns because the information was pretty irrelevant. Note, the two columns added to this CSV were number of emojis in title and the number of words in each title (set this up with a counter variable for each line). This allowed me to create my first CSV, [clean_data.csv](./clean_data.csv). 
@@ -16,25 +16,25 @@ Here, my goal was to use pattern matching to find any emojis that could exist in
 The next CSV I created was [clean_data_wordcounts.csv](./clean_data_wordcounts.csv) which included the count of every word that appeared in the text EXCLUDING stopwords such as "it," "the," and "they." However, I also ran into an issue there; specifically, words were not being counted as the same due to extra punctuation being added at the end. For example, "money" and "money!" would not be counted as the same. Instead their values would be stored seperately. So, I used regex again, but this time to strip my data of punctuation, URLS, and any extra whitespaces. See the following code:
 
 
-#strip punctuation
-twl[i] = re.sub(r'[^\w\s]', '', twl[i])
-#strip websites
-twl[i] = re.sub("https*\S+", " ", twl[i])
-#strip white space
-twl[i] = re.sub('\s{2,}', " ", twl[i])
+    #strip punctuation
+    twl[i] = re.sub(r'[^\w\s]', '', twl[i])
+    #strip websites
+    twl[i] = re.sub("https*\S+", " ", twl[i])
+    #strip white space
+    twl[i] = re.sub('\s{2,}', " ", twl[i])
 
 
 To get the counts of each word, I stored each word and it's value in a dictionary. I had one for the title words and one for the body words. After, I combined the two dictionaries with their keys and values using the following code:
 
 
-#combine dictionaries to form all words
-WORDS = {}
-WORDS.update(titlewordsdict)
-for key, value in bodywords.items():
-    if key in WORDS:
-        WORDS[key] += value
-    else:
-        WORDS.update({key: value})
+    #combine dictionaries to form all words
+    WORDS = {}
+    WORDS.update(titlewordsdict)
+    for key, value in bodywords.items():
+        if key in WORDS:
+            WORDS[key] += value
+        else:
+            WORDS.update({key: value})
 
 
 This allowed me to prevent repeats.
@@ -42,12 +42,12 @@ This allowed me to prevent repeats.
 The next CSV I created was [clean_data_timestamps.csv](./clean_data_timestamps). This goal of this data is to show what words in the title are popular when. To do this, I just parsed through each word in the title and added the timestamp as I parsed through each line of the original CSV. I ended up only parsing the date because the time data wasn't particularly relevant to me. To make sure I separated the time and date data, I used the following code:
 
 
-#note:line[7] here means the 7th "column" of the line that the program is parsing through in the original csv
-timestamp = line[7].split(" ")        
-#write in timestamp data
-##parse through title words to assign each one a timestamp
-for i in titlewords:
-    timestamp_data.write('"' + i.lower() + '"' + ',' + timestamp[0] + "\n")
+    #note:line[7] here means the 7th "column" of the line that the program is parsing through in the original csv
+    timestamp = line[7].split(" ")        
+    #write in timestamp data
+    ##parse through title words to assign each one a timestamp
+    for i in titlewords:
+        timestamp_data.write('"' + i.lower() + '"' + ',' + timestamp[0] + "\n")
 
 
 ### The Raw Data (First 20 Rows)
