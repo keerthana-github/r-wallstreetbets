@@ -2,7 +2,7 @@
 
 
 ## Data set details:
-I decided I wanted to take a look at Reddit data; specifically, I wanted to take a look at the subreddit [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets/). Having some difficulty with using a web parser, I decided to go with a dataset I ended up finding on [Kaggle](https://www.kaggle.com/gpreda/reddit-wallstreetsbets-posts) with a person who was able to collect the data using Reddit's API. The data came in a CSV format and included values such as the post title, number of upvotes (or the score), the url, the number of comments, the content in the body, and when the content was posted. As you can see from the first 20 rows from the original data set, there is a lot of data to parse through and a lot of unnecessary information. The first task was getting rid of all the emojis in the title and body because Excel could not parse/understand the data and instead returned unconventional characters. To accomplish that, I used a regex expression:
+I decided I wanted to take a look at Reddit data; specifically, I wanted to take a look at the subreddit [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets/). Having some difficulty with using a web parser, I decided to go with a dataset I ended up finding on [Kaggle](https://www.kaggle.com/gpreda/reddit-wallstreetsbets-posts) with a person who was able to collect the data using Reddit's API. The data came in a CSV format and included values such as the post title, number of upvotes (or the score), the url, the number of comments, the content in the body, and when the content was posted, starting from January 28, 2021. As you can see from the first 20 rows from the original data set, there is a lot of data to parse through and a lot of unnecessary information. The first task was getting rid of all the emojis in the title and body because Excel could not parse/understand the data and instead returned unconventional characters. To accomplish that, I used a regex expression:
 
 
     def strip_emoji(text):
@@ -79,10 +79,135 @@ $GME back up to ~350USD after hours|304|l6tkvw|https://i.redd.it/tlb66b19w1e61.j
 
 
 ## Analysis:
+Let's break down the data starting with an overview from [clean_data.csv](./clean_data.csv).
 
-- Describe each of the aggregate statistic you have calculated - include a description of each and describe any insights the statistic shows that may not be obvious to someone just viewing the raw data.
-- If using a pivot table for analysis, include a Markdown table showing a sample of the results of the pivot table (no more than 20 rows, please), along with a short description of what the results show and any insights they offer.
-- If using a chart for visualization, include the chart image in the report, with a short description of what the image shows and any insights it offers.  See the Markdown guide linked above for details of showing an image.
+Beginning with the average number of comments per post, the calculated mean was 164.866046. This means in a normal distribution, on average, a post can be expected to have approximately 164 comments. However, we should note, that there is a significant possibility of the data being skewed indicated by the fact that the highest number of upvotes a post has had is 348241 while the lowest is 0 and the most common is 1. With such a wide range of results, I decided to dig deeper into what was the most likely cause for the data being skewed; specifically the number of upvotes, or the SCORE.
+
+The overall average upvote per post, without picking apart the data is 1224.9977. This means that for any Reddit post on r/WallStreetBets you can expect 1224 unqiue IDs (people) to have upvoted the post. Or can you? 75% of the posts (or 27411 out of 36520 posts) have either 138 upvotes or below. Compared to the mean, this is a SIGNIFICANT drop by approximately 1100 upvotes. Therefore, I decided to calculate the averages of the bottom 75% and the top 25%. For the bottom 75%, we recieve an average of 21.56874977, meaning per post, the bottom 75% can expect to get an average of 21 upvotes per post. For the top 25% however, we calculate an average of 4846.38215, meaning per post, the top 25% can expect to recieve 4846 upvotes per post. The difference between these two numbers is approximately 4820 upvotes.
+
+I then decided to take a look at the max number of upvotes per post based on the day they were posted as indicated by the image below.
+
+![clean_data](./images/upvotes_128_21.png)
+
+As you can see, the days after Robinhood closed trading for GME stock on January 28, 2021, the maximum of upvotes per day seemed to grow higher. This may be due to the influx of people who flooded the subreddit after hearing about the chaos on the news. However, come February 1, 2021, there seemed to be a sudden drop in upvotes - this could be due to an anomoly in the on January 31, 2021 where a post caught attention from several other subreddits, news, or social media. Or this could just be an example of where trends quickly come and go. The graph also shows that there is no data included for January 22, 2021. It only begins from January 28, 2021.
+
+There were also some other interesting statistics such as the average number of emojis in a title, 0.713964951 (approximately 1 per post due to the popular use of the rocket emoji to symbolize the phrase "to the moon"), and the average title length, 10.84008762 (meaning approximately 10 words per title).
+
+See below a condensed version of the data mentioned above.
+
+As for the pivot table included with this data, I am unable to provide a condensed version of said table due to the fact that it has thousands of rows and columns. Please view [clean_data.csv](./clean_data.csv) to see the pivot table. The rows in the pivot table are sorted by score, while the columns are calculated by number of comments. The pivot table provides the average number of emojis per post, the length of the title per post, and number of posts (indicated by count of timestamps) based on number of upvotes and number of comments. This helps indicate what are the most popularly recvieved posts.
+
+### Statistics Calculated
+
+type of statistic | calculated 
+------------------|-----------
+AVERAGE OF COMMENTS	| 164.866046
+AVERAGE OF SCORE | 1224.9977
+MODE OF SCORES | 1
+MAX OF SCORES | 348241
+MIN OF SCORES | 0
+QUARTILE 75 | 138
+COUNTIF SCORE <= 138 | 27411
+AVERAGEIF SCORE > 138 | 4846.38215
+DAVERAGE OF SCORE IF SCORE <= 138 | 21.56874977
+MAXIF SCORE DATE 1/22/21 (DATA NOT INCLUDED) | 0
+MAXIF SCORE DATE 1/28/21 (ROBINHOOD LIMITED USERS) | 160999
+MAXIF SCORE DATE 1/29/21 | 225870
+MAXIF SCORE DATE 1/30/21 | 219779
+MAXIF SCORE DATE 1/31/21 | 348241
+MAXIF SCORE DATE 2/1/21 | 171545
+AVERAGE OF EMOJI COUNT | 0.713964951
+AVERAGE OF TITLE LENGTH | 10.84008762
+
+
+Now, let's look at [clean_data_timestamps.csv](./clean_data_timestamps). Due to the nature of using Excel, I was unable to conduct the NLP tests I desired, but I was able to observe some interesting trends regardless. Note: I did not choose to exclude the stopwords here due to use of data for future analysis at a later date. Now moving forward, the most commonly referenced word was "the." 
+
+Looking at the graph, the number of words based on each date seemed to peak on January 29, 2021 (as indicated in the graph below); however there was a jump on February 3, 2021. The peak on January 29 can be due to the fact that RobinHood closed trading the day before on January 28. The sudden peak on February 3 may be due to an influx of bots spamming the subreddit. 
+
+![timestamp_chart](./images/timestamp_titlewords.png)
+
+See below a condensed version of the data mentioned above.
+
+The pivot chart shows the words and how many times it appears in each month. Because of the sheer amount of data, not all the words are able to be seen on one chart alone; however, we do see some spikes such as "GME" peaking in January, "a" peaking in February, and "the" peaking in January. Note: the pivot chart reinforces earlier claims about "the" being the most popular word.
+
+![timestamp_pivot](./images/timestamp_titleword_pivotcahrt.png)
+
+The pivot table the chart was derived from is indicated below, showing the most popular words based on their appearence in each month. 
+
+### Pivot Table 
+
+words| jan | feb | grand total	
+-----|-----|-----|------------			
+0 | 28 | 39 | 67
+1 | 186 | 155 | 341
+2 | 105 | 201 | 306
+3 | 60 | 107 | 167
+4 | 48 | 72 | 120
+5 | 66 | 85 | 151
+6 | 24 | 43 | 67
+7 | 26 | 35 | 61
+8 | 20 | 40 | 60
+9 | 15 | 37 | 52
+10 | 54 | 91 | 145
+
+### Statistics Calculated
+
+type of statistic | calculated 
+------------------|-----------
+MODE | the
+COUNTIF JAN28 | 12387
+COUNTIF JAN29 | 159938
+COUNTIF JAN30 | 17363
+COUNTIF JAN31 | 11903
+COUNTIF FEB1 | 11630
+COUNTIF FEB2 | 18777
+COUNTIF FEB3 | 31834
+COUNTIF FEB4 | 17863
+
+And the last CSV to observe is [clean_data_wordcounts.csv](./clean_data_wordcounts.csv). This is the CSV where the number of counts have been calculated based on how often a word appears on the subreddit. As we can see, we have 1626135 words from the span of January 28, 2021, to when the data was exported on February 26, 2021. On average , there are approximately 15 (calculated average is 15.86968615) instances of each word (not including stop words); however, the median is 1, meaning that the middle value of the number of instances per word is 1. Given that there is a pretty large difference between the average and the median, this means the data is most likely skewed. This is reinforced by the standard deviation which is 167.298439. This means the values of the count tend to be farther away from the calculated average. Given that the data is pretty skewed, I wanted to see what was the most popular and the least popular term. GME was the most popular term with 17691 counts while steiner was the least popular with 1 count. However, note that there are several terms with a count of 1; the spreadsheet returned the most recent value in the table. I also decided to calculate how many words had one instance and how many words had 15 instances. I got 67582 and 4516 words respectively. I then wanted to see how many words existed that had some variation of game within it (game*) and I found out there were 182 counts. This may occur because of spelling errors or compound words, but I thought it was interesting to see how many variations for the word game occured.
+
+See below a condensed version of the data mentioned above.
+
+The pivot chart shows the words and the number of times it appears. As we can see, GME is the most popular term, reinforcing the statistical analysis conducted earlier.
+
+![wordcount_total](./images/wordcount_total_pivotchart.png)
+
+The pivot table the chart was derived from is indicated below, showing the most popular words to the least popular words. 
+
+### Pivot Table 
+
+
+word | count
+-----|------
+gme | 17691
+buy | 10558
+stock | 10181
+shares | 9238
+like | 9132
+im | 8785
+short | 8176
+dont | 8171
+market | 8151
+hold | 7511
+get | 7142
+people | 7068
+price | 6896
+robinhood | 6857
+money | 6641
+
+### Statistics Calculated
+
+type of statistic | calculated 
+------------------|-----------
+SUM | 1626135	
+AVERAGE | 15.86968615	
+MEDIAN | 1	
+MAX | 17691(gme)
+MIN	| 1(steiner)
+STD | 167.298439	
+SUMIF (all counts = 1) | 67582
+SUMIF (all counts approx. avg 15) | 4516
+COUNTIF (game*) | 182
 
 ## Extra-credit
-This assignment deserves extra credit because iste numquam eos et repudiandae sint enim. Rerum enim voluptas voluptatem consequuntur. Sed atque deserunt nihil eius neque et provident aspernatur. Incidunt iusto beatae illo minus vel. Quis sint sunt et facilis doloribus eligendi error est. Ipsum similique.
+This assignment deserves extra credit based on the requirements provided for extra credit. Although I was unable to collect data with a webscrapper myself, the data I'm working with is both big (over 35,000 entries) and complex (related to NLP by parsing through text data even if NLP wasn't explicitly conducted using Excel and conducting three separate analyses). Because of the way I parsed my data, some of the CSVs include over 100,000 data entries. Given that I've parsed through that much data and was successful in the process, I would be grateful if I was offered extra credit.
