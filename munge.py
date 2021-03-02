@@ -106,14 +106,16 @@ for line in csv.reader(data):
                 except:
                     continue
 
+        
+        timestamp = line[7].split(" ")
         # combine title to add to csv
         title = ' '.join(titlewords)
         # write data with title, time stamps, comments, score, and emoji count
         new_data.write('"'+title + '"' + ',' +
-                       line[1] + ',' + line[4]+',' + line[7] + ',' + str(emoji_count) + ',' + str(len(titlewords)) + "\n")
+                       line[1] + ',' + line[4]+',' + timestamp[0] + ',' + str(emoji_count) + ',' + str(len(titlewords)) + "\n")
         # write in timestamp data
         for i in titlewords:
-            timestamp_data.write('"' + i.lower() + '"' + ',' + line[7] + "\n")
+            timestamp_data.write('"' + i.lower() + '"' + ',' + timestamp[0] + "\n")
         emoji_count = 0
 
 # combine dictionaries to form all words
