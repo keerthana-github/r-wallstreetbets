@@ -4,7 +4,7 @@
 ## Data set details:
 I decided I wanted to take a look at Reddit data; specifically, I wanted to take a look at the subreddit [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets/). Having some difficulty with using a web parser, I decided to go with a dataset I ended up finding on [Kaggle](https://www.kaggle.com/gpreda/reddit-wallstreetsbets-posts) with a person who was able to collect the data using Reddit's API. The data came in a CSV format and included values such as the post title, number of upvotes (or the score), the url, the number of comments, the content in the body, and when the content was posted. As you can see from the first 20 rows from the original data set, there is a lot of data to parse through and a lot of unnecessary information. The first task was getting rid of all the emojis in the title and body because Excel could not parse/understand the data and instead returned unconventional characters. To accomplish that, I used a regex expression:
 
-'''python
+'''
 def strip_emoji(text):
     RE_EMOJI = re.compile(
         u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
@@ -15,7 +15,7 @@ Here, my goal was to use pattern matching to find any emojis that could exist in
 
 The next CSV I created was [clean_data_wordcounts.csv](./clean_data_wordcounts.csv) which included the count of every word that appeared in the text EXCLUDING stopwords such as "it," "the," and "they." However, I also ran into an issue there; specifically, words were not being counted as the same due to extra punctuation being added at the end. For example, "money" and "money!" would not be counted as the same. Instead their values would be stored seperately. So, I used regex again, but this time to strip my data of punctuation, URLS, and any extra whitespaces. See the following code:
 
-'''python
+'''
 #strip punctuation
 twl[i] = re.sub(r'[^\w\s]', '', twl[i])
 #strip websites
@@ -26,7 +26,7 @@ twl[i] = re.sub('\s{2,}', " ", twl[i])
 
 To get the counts of each word, I stored each word and it's value in a dictionary. I had one for the title words and one for the body words. After, I combined the two dictionaries with their keys and values using the following code:
 
-'''python
+'''
 #combine dictionaries to form all words
 WORDS = {}
 WORDS.update(titlewordsdict)
