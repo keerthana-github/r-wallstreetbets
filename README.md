@@ -6,6 +6,7 @@ Data set details:
 - The origin of your data set - what is it and where does it come from.  Include a link to the URL of the source.
 - What format the original data file was in (CSV, JSON, or other).
 - Display some of the raw data from the original data file (the first 20 rows is enough).  Use Markdown's ability to display tables - see the examples in the Markdown guide linked above.
+
 title | score | id | url | comms_num | created | body | timestamp
 ------| ------|----|-----|-----------|---------|------|----------
 "It's not about the money, it's about sending a message. 🚀💎🙌"|55|l6ulcx|https://v.redd.it/6j75regs72e61|6|1611862661.0||2021-01-28 21:37:41
